@@ -1,0 +1,4 @@
+# Keep .git (the spec bakes full history into the commit image). Prune only build outputs so the
+# build context stays small — cargo/cargo-fuzz regenerate these inside the image.
+target/
+mayhem/fuzz/target/

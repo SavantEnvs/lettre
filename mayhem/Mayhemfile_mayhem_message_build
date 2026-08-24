@@ -1,0 +1,14 @@
+# Mayhem target: mayhem_message_build — lettre's MessageBuilder / body-encoding / EmailWriter
+# serialization pipeline (Message::builder()...body(...).formatted()), built by mayhem/build.sh
+# via cargo-fuzz at /mayhem/mayhem_message_build. 4 seeds under
+# mayhem/mayhem_message_build/testsuite/: NUL-separated from/to/subject/message-id/body fields
+# (see the harness header comment for the framing), including a Unicode-subject/body case that
+# exercises the RFC2047 word-encoder.
+project: savantenvs/lettre
+target: mayhem_message_build
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/mayhem_message_build/testsuite
+cmds:
+  - cmd: /mayhem/mayhem_message_build
+    libfuzzer: true

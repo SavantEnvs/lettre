@@ -1,0 +1,13 @@
+# Mayhem target: mayhem_mailbox_parse — lettre's RFC5322/RFC2822 header-value parsers
+# (Mailbox/Mailboxes/Address::from_str, ContentType/ContentDisposition/Date::parse), built by
+# mayhem/build.sh via cargo-fuzz at /mayhem/mayhem_mailbox_parse. 16 seeds under
+# mayhem/mayhem_mailbox_parse/testsuite/ (plain-text mailbox/address/content-type/
+# content-disposition/date fixtures lifted from lettre's own unit tests and doc examples).
+project: savantenvs/lettre
+target: mayhem_mailbox_parse
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/mayhem_mailbox_parse/testsuite
+cmds:
+  - cmd: /mayhem/mayhem_mailbox_parse
+    libfuzzer: true
