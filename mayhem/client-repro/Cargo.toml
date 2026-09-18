@@ -1,0 +1,33 @@
+[package]
+name = "client-repro"
+version = "0.0.0"
+authors = ["savantenvs mayhem backport"]
+publish = false
+edition = "2021"
+
+[dependencies]
+# Same dependency the original mayhemheroes harness had (mayhem/client/Cargo.toml on the fuzzed
+# fork: `[dependencies.lettre] path = "../.."`), narrowed to the features its code path needs:
+# builder for Message::builder(), smtp-transport for SmtpTransport/SmtpConnection. No TLS backend
+# (builder_dangerous() dials plaintext), so the offline build closure stays small.
+lettre = { path = "../..", default-features = false, features = ["builder", "smtp-transport"] }
+
+# Keep this crate out of any parent workspace (lettre's root Cargo.toml has no [workspace] table),
+# the same way mayhem/fuzz does.
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "client-buggy-mhh-run-30"
+path = "src/main.rs"
+test = false
+doc = false
+
+[profile.release]
+opt-level = 3
+debug = true
+# Rust's DEFAULT unwinding panic, which is what the original harness did: a panic in lettre unwinds
+# out of main, the runtime prints the panic line, the process exits 101 — no signal, so the crash
+# report carries no backtrace, exactly like the run this backport reproduces. (panic = "abort" was
+# measured and rejected: SIGABRT makes Mayhem's triager synthesize a backtrace of its own, and it
+# then folds all 22 crashing inputs into a single defect, which the original run did not do.)

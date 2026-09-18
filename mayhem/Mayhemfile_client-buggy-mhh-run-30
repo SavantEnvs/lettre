@@ -1,0 +1,18 @@
+# Backport target: client-buggy-mhh-run-30 — the mayhemheroes `client` target
+# (https://app.mayhem.security/mayhemheroes/lettre/client/30) rebuilt for v2. The original was a
+# plain binary (/client) driven by Mayhem's NETWORK fuzzer (network url tcp://127.0.0.1:25, client
+# mode), the fuzzed bytes being the SMTP server's responses to lettre's client. This target
+# keeps the harness form (a plain, non-libFuzzer binary whose only crash output is the Rust panic
+# line) and moves the input to a file: mayhem/client-repro/src/main.rs serves the test case's bytes
+# to lettre's SmtpTransport over a loopback socket. Built by mayhem/build.sh with plain cargo at
+# /mayhem/client-buggy-mhh-run-30 (same binary as /mayhem/client-buggy-mhh-run-30-standalone).
+# origin: https://app.mayhem.security/mayhemheroes/lettre/client/30
+project: savantenvs/lettre
+target: client-buggy-mhh-run-30
+cmds:
+  - cmd: /mayhem/client-buggy-mhh-run-30 @@
+    env:
+      # Keep the crash output exactly what the original run triaged: the panic line and nothing
+      # else. A backtrace here would be Rust's, not the target's own, and it is not what the
+      # original harness printed.
+      RUST_BACKTRACE: '0'

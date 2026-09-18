@@ -1,0 +1,42 @@
+[package]
+name = "lettre-mayhem-fuzz"
+version = "0.0.0"
+authors = ["savantenvs mayhem integration"]
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+# builder: MessageBuilder/Message/SinglePart/body-encoding pipeline (mayhem_message_build).
+# default-features = false drops the smtp-transport/native-tls/pool network+TLS surface, which is
+# not fuzzable without a real server and would only bloat the offline build closure.
+lettre = { path = "../..", default-features = false, features = ["builder"] }
+
+# Prevent this crate from being pulled into any parent workspace (lettre's root Cargo.toml has
+# no [workspace] table -- lettre is a single-crate repo -- but this keeps the invariant explicit
+# and matches the fleet-wide convention for any crate added under mayhem/).
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "mayhem_mailbox_parse"
+path = "fuzz_targets/mayhem_mailbox_parse.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "mayhem_message_build"
+path = "fuzz_targets/mayhem_message_build.rs"
+test = false
+doc = false
+
+[profile.release]
+opt-level = 3
+debug = true
+
+[profile.dev]
+opt-level = 3
+debug = true
